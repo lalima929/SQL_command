@@ -1,0 +1,18 @@
+SELECT
+    student_id,
+    semester,
+    average_marks,
+    LAG(average_marks) OVER (
+        PARTITION BY student_id
+        ORDER BY semester
+    ) AS previous_average,
+    ROUND(
+        average_marks -
+        LAG(average_marks) OVER (
+            PARTITION BY student_id
+            ORDER BY semester
+        ),
+        2
+    ) AS improvement
+FROM student_semester_performance
+ORDER BY student_id, semester;
