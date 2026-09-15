@@ -1,0 +1,33 @@
+WITH StudentAverage AS (
+    SELECT
+        s.student_id,
+        s.student_name,
+        s.department_id,
+        AVG(m.marks) AS student_avg
+    FROM students s
+    JOIN marks m
+        ON s.student_id = m.student_id
+    GROUP BY
+        s.student_id,
+        s.student_name,
+        s.department_id
+),
+DepartmentAverage AS (
+    SELECT
+        s.department_id,
+        AVG(m.marks) AS department_avg
+    FROM students s
+    JOIN marks m
+        ON s.student_id = m.student_id
+    GROUP BY s.department_id
+)
+SELECT
+    sa.student_id,
+    sa.student_name,
+    ROUND(sa.student_avg, 2) AS student_average,
+    ROUND(da.department_avg, 2) AS department_average
+FROM StudentAverage sa
+JOIN DepartmentAverage da
+    ON sa.department_id = da.department_id
+WHERE sa.student_avg > da.department_avg
+ORDER BY sa.student_avg DESC;
