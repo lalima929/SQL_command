@@ -1,0 +1,30 @@
+WITH RankedStudents AS (
+    SELECT
+        s.student_id,
+        s.student_name,
+        d.department_name,
+        AVG(m.marks) AS average_marks,
+        DENSE_RANK() OVER (
+            PARTITION BY s.department_id
+            ORDER BY AVG(m.marks) DESC
+        ) AS student_rank
+    FROM students s
+    JOIN departments d
+        ON s.department_id = d.department_id
+    JOIN marks m
+        ON s.student_id = m.student_id
+    GROUP BY
+        s.student_id,
+        s.student_name,
+        s.department_id,
+        d.department_name
+)
+SELECT
+    student_id,
+    student_name,
+    department_name,
+    ROUND(average_marks, 2) AS average_marks,
+    student_rank
+FROM RankedStudents
+WHERE student_rank <= 3
+ORDER BY department_name, student_rank;
